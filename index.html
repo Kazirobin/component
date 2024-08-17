@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-6">
+    <!-- Responsive Navigation Bar -->
+    <nav class="shadow mb-6">
+        <div class="container mx-auto p-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold">Component Library</a>
+            <button class="md:hidden block text-gray-500" id="menu-toggle">
+                <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <div class="hidden md:flex space-x-6" id="menu">
+                <a href="#" class="category-filter" data-category="nav">Nav</a>
+                <a href="#" class="category-filter" data-category="footer">Footer</a>
+                <a href="#" class="category-filter" data-category="banner">Banner</a>
+                <a href="#" class="category-filter" data-category="about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Subcategory Navigation -->
+    <div class="container mx-auto mb-6">
+        <div class="flex space-x-4" id="subcategories">
+            <!-- Subcategory buttons will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Components Display Area -->
+    <div id="components" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Components will be dynamically inserted here -->
+    </div>
+</body>
+<script src="./data.js"></script>
+<script src="./script.js"></script>
+</html>
