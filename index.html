@@ -1,40 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Component Library</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 p-6">
-    <!-- Responsive Navigation Bar -->
-    <nav class="shadow mb-6">
-        <div class="container mx-auto p-4 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold">Component Library</a>
-            <button class="md:hidden block text-gray-500" id="menu-toggle">
-                <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-            <div class="hidden md:flex space-x-6" id="menu">
-                <a href="#" class="category-filter" data-category="nav">Nav</a>
-                <a href="#" class="category-filter" data-category="footer">Footer</a>
-                <a href="#" class="category-filter" data-category="banner">Banner</a>
-                <a href="#" class="category-filter" data-category="about">About</a>
-            </div>
-        </div>
-    </nav>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Dynamic Component Library</title>
+    <style>
+      /* Basic Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    <!-- Subcategory Navigation -->
-    <div class="container mx-auto mb-6">
-        <div class="flex space-x-4" id="subcategories">
-            <!-- Subcategory buttons will be dynamically inserted here -->
-        </div>
-    </div>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        line-height: 1.6;
+      }
 
-    <!-- Components Display Area -->
-    <div id="components" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Components will be dynamically inserted here -->
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .search {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .search h1 {
+        margin-bottom: 10px;
+        font-size: 24px;
+      }
+
+      .search input[type="search"] {
+        padding: 10px;
+        width: 80%;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+
+      .search button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .search button:hover {
+        background-color: #0056b3;
+      }
+
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .category {
+        margin: 10px;
+        padding: 15px;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .category:hover {
+        background-color: #0056b3;
+      }
+
+      .subCategory {
+        margin: 5px 0;
+        padding: 10px;
+        background-color: #6c757d;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .subCategory:hover {
+        background-color: #5a6268;
+      }
+
+      .view {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 4px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .view h1 {
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+
+      .buttons {
+        text-align: center;
+      }
+
+      .buttons button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .buttons button:hover {
+        background-color: #218838;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        .category {
+          flex: 1 1 100%;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .search input[type="search"] {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .search button {
+          width: 100%;
+        }
+
+        .buttons button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="search">
+        <h1>Category or SubCategory</h1>
+        <input type="search" id="search" placeholder="Search..." />
+        <button id="find">Find</button>
+      </div>
+
+      <div class="menu"></div>
+
+      <div class="view"></div>
+
+      <div class="buttons">
+        <button class="copyHtml">Copy HTML</button>
+        <button class="copyCss">Copy CSS</button>
+      </div>
     </div>
-</body>
-<script src="./data.js"></script>
-<script src="./script.js"></script>
+<div class="container">
+    <div class="h-14 bg-blue-800">
+        <a href="./edit.html" class="text-white font-bold px-4 py-2 inline-block rounded-sm bg-slate-600 cursor-pointer m-4">Edit</a>
+        <a href="./object.html" class="text-white font-bold px-4 py-2 inline-block rounded-sm bg-slate-600 cursor-pointer m-4">Object</a>
+    </div>
+</div>
+
+    <script src="./data.js"></script>
+    <script src="./script.js"></script>
+   <script src='https://cdn.tailwindcss.com'></script>
+  </body>
 </html>

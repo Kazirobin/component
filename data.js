@@ -1,19 +1,42 @@
-const components = [
+const store = [
     {
-        "id": "nav-1",
-        "category": "nav",
-        "subcategory": "nav-1",
-        "title": "Navigation Bar 1",
-        "html": `<nav class="bg-gray-800 text-white p-4"><h1>Nav Bar 1</h1></nav>`,
-        "css": `nav { background-color: #333; color: white; padding: 1rem; }`
+      id: 1,
+      category: "nav",
+      subCategory: "nav-1",
+      title: "this is nav-1",
+      html: `
+    <div class="nav-1">
+        <h1>nav-1 heading</h1>
+        </div>
+    `,
+      css: `.nav-1 >h1{color:red}`,
     },
     {
-        "id": "footer-1",
-        "category": "footer",
-        "subcategory": "footer-1",
-        "title": "Footer 1",
-        "html": `<footer class="bg-gray-800 text-white p-4"><h1>Footer 1</h1></footer>`,
-        "css": `footer { background-color: #333; color: white; padding: 1rem; }`
+      id: 2,
+      category: "nav",
+      subCategory: "nav-2",
+      title: "this is nav-2",
+      html: `
+      <div class="nav-2">
+      <h1>nav-2 heading</h1>
+      </div>
+      `,
+      css: `.nav-2 >h1{color:blue}`,
     },
-    // Add more components with different categories and subcategories...
-];
+    {
+      id: 3,
+      category: "footer",
+      subCategory: "footer-1",
+      title: "this is footer-1",
+      html: `<h1>footer-1 heading</h1>`,
+      css: `h1{color:green}`,
+    },
+    {
+      id: 4,
+      category: "banner",
+      subCategory: "banner-1",
+      title: "this is banner-1",
+      html: `<h1>banner-1 heading</h1>`,
+      css: `h1{color:purple}`,
+    },
+  ];

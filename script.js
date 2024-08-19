@@ -1,90 +1,135 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const componentsContainer = document.getElementById('components');
-    const subcategoriesContainer = document.getElementById('subcategories');
-    const menuToggle = document.getElementById('menu-toggle');
-    const menu = document.getElementById('menu');
 
-    // Toggle menu on small screens
-    menuToggle.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
+let currentStyleTag = null;
+
+function generateMenu() {
+  const menu = document.querySelector(".menu");
+  const categories = {};
+
+  // Group items by category and subcategory
+  store.forEach((item) => {
+    if (!categories[item.category]) {
+      categories[item.category] = [];
+    }
+    categories[item.category].push(item.subCategory);
+  });
+
+  // Create HTML for the navigation
+  let menuHtml = "";
+  for (let category in categories) {
+    menuHtml += `<div class="category" data-category="${category}">${category}`;
+    categories[category].forEach((subCategory) => {
+      menuHtml += `<div class="subCategory" data-category="${category}" data-subcategory="${subCategory}">${subCategory}</div>`;
     });
+    menuHtml += `</div>`;
+  }
 
-    // Function to render components
-    function renderComponents(filterCategory = null, filterSubcategory = null) {
-        componentsContainer.innerHTML = '';
+  menu.innerHTML = menuHtml;
+}
 
-        components
-            .filter(component => 
-                (!filterCategory || component.category === filterCategory) &&
-                (!filterSubcategory || component.subcategory === filterSubcategory)
-            )
-            .forEach(component => {
-                const componentCard = document.createElement('div');
-                componentCard.classList.add('p-4', 'bg-white', 'rounded', 'shadow');
+function renderComponent(category, subCategory) {
+  const component = store.find(
+    (item) =>
+      item.category === category && item.subCategory === subCategory
+  );
+  if (component) {
+    const view = document.querySelector(".view");
+    view.innerHTML = component.html;
 
-                const styleTag = document.createElement('style');
-                styleTag.innerHTML = component.css;
-                document.head.appendChild(styleTag);
-
-                componentCard.innerHTML = `
-                    <h2 class="text-lg font-bold mb-2">${component.title}</h2>
-                    <div class="preview mb-4">${component.html}</div>
-                    <button class="copy-html bg-blue-500 text-white px-4 py-2 rounded mr-2">Copy HTML</button>
-                    <button class="copy-css bg-green-500 text-white px-4 py-2 rounded">Copy CSS</button>
-                `;
-
-                componentCard.querySelector('.copy-html').addEventListener('click', () => {
-                    copyToClipboard(component.html);
-                    alert('HTML copied to clipboard!');
-                });
-
-                componentCard.querySelector('.copy-css').addEventListener('click', () => {
-                    copyToClipboard(component.css);
-                    alert('CSS copied to clipboard!');
-                });
-
-                componentsContainer.appendChild(componentCard);
-            });
+    // Remove previous style tag if it exists
+    if (currentStyleTag) {
+      document.head.removeChild(currentStyleTag);
     }
 
-    // Function to render subcategories
-    function renderSubcategories(category) {
-        subcategoriesContainer.innerHTML = '';
+    // Create a new style tag and add it to the head
+    currentStyleTag = document.createElement("style");
+    currentStyleTag.textContent = component.css;
+    document.head.appendChild(currentStyleTag);
 
-        const subcategories = [...new Set(components.filter(component => component.category === category).map(component => component.subcategory))];
+    document.querySelector(".copyHtml").dataset.html = component.html;
+    document.querySelector(".copyCss").dataset.css = component.css;
+  }
+}
 
-        subcategories.forEach(subcategory => {
-            const subcategoryButton = document.createElement('button');
-            subcategoryButton.classList.add('bg-gray-200', 'px-4', 'py-2', 'rounded');
-            subcategoryButton.innerText = subcategory;
-            subcategoryButton.addEventListener('click', () => {
-                renderComponents(category, subcategory);
-            });
+function showCategoryComponents(category) {
+  const components = store.filter((item) => item.category === category);
+  const view = document.querySelector(".view");
+  view.innerHTML = "";
 
-            subcategoriesContainer.appendChild(subcategoryButton);
-        });
+  // Remove any existing style tags to avoid conflicts
+  if (currentStyleTag) {
+    document.head.removeChild(currentStyleTag);
+    currentStyleTag = null;
+  }
+
+  components.forEach((component) => {
+    const componentDiv = document.createElement("div");
+    componentDiv.innerHTML = `<h2>${component.subCategory}</h2>${component.html}`;
+    view.appendChild(componentDiv);
+
+    // Apply CSS to each component
+    const styleTag = document.createElement("style");
+    styleTag.textContent = component.css;
+    componentDiv.appendChild(styleTag);
+  });
+
+  // Prepare HTML and CSS for copying
+  document.querySelector(".copyHtml").dataset.html = components
+    .map((c) => c.html)
+    .join("\n");
+  document.querySelector(".copyCss").dataset.css = components
+    .map((c) => c.css)
+    .join("\n");
+}
+
+document
+  .querySelector(".menu")
+  .addEventListener("click", function (event) {
+    if (event.target.classList.contains("subCategory")) {
+      const category = event.target.dataset.category;
+      const subCategory = event.target.dataset.subcategory;
+      renderComponent(category, subCategory);
+    } else if (event.target.classList.contains("category")) {
+      const category = event.target.dataset.category;
+      showCategoryComponents(category);
     }
+  });
 
-    // Event listener for category filtering
-    document.querySelectorAll('.category-filter').forEach(link => {
-        link.addEventListener('click', event => {
-            event.preventDefault();
-            const category = event.target.dataset.category;
-            renderSubcategories(category);
-            renderComponents(category);
-        });
-    });
-
-    // Initially render all components
-    renderComponents();
+document.getElementById("find").addEventListener("click", function () {
+  const searchValue = document
+    .getElementById("search")
+    .value.trim()
+    .toLowerCase();
+  const result = store.find(
+    (component) =>
+      component.category.toLowerCase().includes(searchValue) ||
+      component.subCategory.toLowerCase().includes(searchValue)
+  );
+  if (result) {
+    renderComponent(result.category, result.subCategory);
+  } else {
+    alert("No component found");
+  }
 });
 
-// Function to copy text to clipboard
+document
+  .querySelector(".copyHtml")
+  .addEventListener("click", function () {
+    copyToClipboard(this.dataset.html);
+  });
+
+document.querySelector(".copyCss").addEventListener("click", function () {
+  copyToClipboard(this.dataset.css);
+});
+
 function copyToClipboard(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textarea);
+  alert("Copied to clipboard");
 }
+
+// Initialize the menu when the page loads
+generateMenu();

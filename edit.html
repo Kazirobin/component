@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Code Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #codeContainer {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 300px;
+            background-color: #fff;
+            border-top: 1px solid #ccc;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            cursor: move;
+            resize: both;
+            overflow: hidden;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #editor {
+            width: 100%;
+            height: 100%;
+        }
+
+        #output {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 200px;
+            background-color: #f9f9f9;
+        }
+
+        #window-width {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .handle {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 10px;
+            background-color: #f1f1f1;
+            border-bottom: 1px solid #ccc;
+            cursor: move;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .handle button {
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .handle button:hover {
+            background-color: #2d3748;
+        }
+        #controls {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #controls button {
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #controls button:hover {
+            background-color: #2d3748;
+        }
+    </style>
+    <!-- Monaco Editor CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs/loader.min.js"></script>
+</head>
+<body>
+    <div class="container w-max-[1200px] m-auto">
+        <div id="window-width"></div>
+        <div id="output" class="mb-2">Your output will be shown here...</div>
+
+   <!-- Fixed-position controls -->
+   <div id="controls">
+    <button onclick="toggleEditor()">Hide/Show Code</button>
+    <button onclick="copyCode()">Copy Code</button>
+</div>
+
+        <div id="codeContainer">
+            <div class="handle">
+                <button onclick="toggleEditor()">Hide/Show Code</button>
+                <button onclick="copyCode()">Copy Code</button>
+            </div>
+            <div id="editor"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load Monaco Editor and configure it with custom suggestions
+        require.config({
+            paths: {
+                vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs",
+            },
+        });
+        require(["vs/editor/editor.main"], function () {
+            // Initialize Monaco Editor
+            window.editor = monaco.editor.create(
+                document.getElementById("editor"),
+                {
+                    value: '<h1 class="bg-blue-500 text-white">Hello World</h1>',
+                    language: "html",
+                    theme: "vs-dark",
+                    automaticLayout: true,
+                }
+            );
+
+            // Custom HTML tag suggestions
+            monaco.languages.registerCompletionItemProvider("html", {
+                provideCompletionItems: () => {
+                    const suggestions = [
+                        { label: "div", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<div>\n\t$0\n</div>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "Basic HTML div element" },
+                        { label: "h1", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<h1>$0</h1>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML header 1 element" },
+                        { label: "h2", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<h2>$0</h2>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML header 2 element" },
+                        { label: "h3", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<h3>$0</h3>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML header 3 element" },
+                        { label: "h4", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<h4>$0</h4>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML header 4 element" },
+                        { label: "h5", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<h5>$0</h5>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML header 5 element" },
+                        { label: "h6", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<h6>$0</h6>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML header 6 element" },
+                        { label: "p", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<p>$0</p>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML paragraph element" },
+                        { label: "a", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<a href="$1">$0</a>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML anchor element with href attribute" },
+                        { label: "img", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<img src="$1" alt="$2" />', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML image element with src and alt attributes" },
+                        { label: "ul", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<ul>\n\t<li>$0</li>\n</ul>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML unordered list element" },
+                        { label: "ol", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<ol>\n\t<li>$0</li>\n</ol>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML ordered list element" },
+                        { label: "li", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<li>$0</li>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML list item element" },
+                        { label: "table", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<table>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>$1</th>\n\t\t</tr>\n\t</thead>\n\t<tbody>\n\t\t<tr>\n\t\t\t<td>$0</td>\n\t\t</tr>\n\t</tbody>\n</table>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML table element" },
+                        { label: "tr", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<tr>\n\t<td>$0</td>\n</tr>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML table row element" },
+                        { label: "td", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<td>$0</td>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML table data cell element" },
+                        { label: "th", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<th>$0</th>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML table header cell element" },
+                        { label: "form", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<form action="$1" method="$2">\n\t$0\n</form>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML form element" },
+                        { label: "input", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<input type="$1" name="$2" placeholder="$3" />', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML input element" },
+                        { label: "button", kind: monaco.languages.CompletionItemKind.Snippet, insertText: "<button>$0</button>", insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML button element" },
+                        { label: "meta", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<meta name="$1" content="$2" />', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML meta tag" },
+                        { label: "link", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<link rel="$1" href="$2" />', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML link tag" },
+                        { label: "style", kind: monaco.languages.CompletionItemKind.Snippet, insertText: '<style></style>', insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet, documentation: "HTML style tag" },
+                    ];
+
+                    return { suggestions: suggestions };
+                },
+            });
+
+            // Custom Tailwind CSS class suggestions
+            monaco.languages.registerCompletionItemProvider("html", {
+                provideCompletionItems: () => {
+                    const tailwindClasses = [
+                        "bg-blue-500", "bg-red-500", "bg-green-500", "bg-yellow-500", "bg-gray-500",
+                        "text-white", "text-black", "text-gray-900", "text-gray-600", "text-blue-700",
+                        "flex", "grid", "block", "inline-block", "inline", "hidden",
+                        "p-4", "p-2", "p-6", "m-2", "m-4", "m-6", "my-4", "mx-2", "mt-4", "mb-4", "ml-2", "mr-4",
+                        "rounded-lg", "rounded-md", "rounded-full", "shadow-lg", "shadow-md", "shadow-sm",
+                        "hover:bg-blue-700", "hover:bg-red-700", "hover:bg-green-700", "focus:outline-none",
+                        "border", "border-gray-300", "border-red-500", "border-blue-500", "border-green-500",
+                        "w-32", "w-48", "w-64", "w-full", "h-32", "h-48", "h-64", "h-full",
+                        "max-w-xs", "max-w-sm", "max-w-md", "max-w-lg", "max-w-xl", "max-w-2xl",
+                        "min-w-0", "min-w-full", "min-h-0", "min-h-full", "opacity-50", "opacity-75", "opacity-100",
+                        "transition-all", "duration-300", "ease-in-out", "transform", "scale-105", "rotate-12"
+                    ];
+                    const suggestions = tailwindClasses.map((className) => {
+                        return {
+                            label: className,
+                            kind: monaco.languages.CompletionItemKind.Keyword,
+                            insertText: className,
+                            documentation: `Tailwind CSS class: ${className}`,
+                        };
+                    });
+                    return { suggestions: suggestions };
+                },
+            });
+
+            // Update the output whenever the editor content changes
+            editor.onDidChangeModelContent(updateOutput);
+        });
+
+        // Function to update window width
+        function updateWindowWidth() {
+            const width = window.innerWidth;
+            document.getElementById("window-width").innerText = `Current Window Width: ${width}px`;
+        }
+
+        // Call updateWindowWidth on window resize
+        window.addEventListener("resize", updateWindowWidth);
+
+        // Initial call to display the current width when the page loads
+        updateWindowWidth();
+
+        function updateOutput() {
+            const code = editor.getValue();
+            document.getElementById("output").innerHTML = code;
+        }
+
+        function toggleEditor() {
+            const editorContainer = document.getElementById("codeContainer");
+            editorContainer.style.display = editorContainer.style.display === "none" ? "block" : "none";
+        }
+
+        function copyCode() {
+            const code = editor.getValue();
+            navigator.clipboard.writeText(code).then(() => {
+                alert("Code copied to clipboard!");
+            });
+        }
+
+        // Dragging functionality
+        const codeContainer = document.getElementById("codeContainer");
+        const handle = document.querySelector(".handle");
+
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        handle.addEventListener("mousedown", function (e) {
+            isDragging = true;
+            offsetX = e.clientX - codeContainer.getBoundingClientRect().left;
+            offsetY = e.clientY - codeContainer.getBoundingClientRect().top;
+        });
+
+        document.addEventListener("mousemove", function (e) {
+            if (isDragging) {
+                codeContainer.style.left = `${e.clientX - offsetX}px`;
+                codeContainer.style.top = `${e.clientY - offsetY}px`;
+            }
+        });
+
+        document.addEventListener("mouseup", function () {
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>
